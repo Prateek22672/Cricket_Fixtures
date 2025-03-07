@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Radio+Canada+Big:ital,wght@0,400..700;1,400..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=The+Nautigal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <title>Apple Store Online | Prateek™</title>
+    <link rel="icon" href="logo.jpg">
+    <link rel="stylesheet" href="home.css">
+</head>
+<body>
+  
+<!-- Splash Screen -->
+<div id="splash-screen" style="display: flex; opacity: 1; transition: opacity 1s ease;">
+    <div class="splash-content">
+        <img src="logo.jpg" alt="Loading...">
+
+        <div class="loader"></div>
+
+        <p>&copy; 2024 Prateek™. All rights reserved.</p>
+    </div>
+</div>
+
+    <div class="nav-container">
+        <nav>
+            <ul class="desktop-nav">
+                <li>
+                    <a href="home.html" class="logo"></a>
+                </li>
+                <div class="x1">
+                    <li><a class="store" href="home.html">Home</a></li>
+                    <div class="menu">
+                        <div class="tooltip_menu">
+                            <p>Browse Home</p>
+                            <a href="create.html">Create</a>
+                        </div> 
+                    </div>
+                </div>
+                <div class="x1">
+                    <li><a class="store" href="create.html">Create</a></li>
+                    <div class="menu">
+                        <div class="tooltip_menu">
+                            <a href="create.html"><p>Explore All Create</p></a>
+                            <a href="create.html">Explore All Years</a>
+                            <a href="create.html">Explore All Semesters</a>
+                        </div> 
+                    </div>
+                </div>
+                <div class="x1">
+                    <li><a class="store" href="index.html">Logout</a></li>
+                    <div class="menu">
+                        <div class="tooltip_menu">
+                            <p>Logout Options</p>
+                            <a href="index.html">Redirect To Login Page</a>
+                            <a href="signup.html">Redirect To Create Account Page</a>
+                        </div> 
+                    </div>
+                </div>
+                <li>
+                    <a href="#" class="search"></a>
+                </li>
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="demo">
+                    <div class="offcanvas-header">
+                        <button type="button" class="btn-close" style="margin-top: 20px;" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <a href="store.html">Home</a>
+                        <a href="mac.html">Create</a>
+                        <a href="ipad.html">Logout</a>
+                    </div>
+                </div>
+            </ul>
+        </nav>
+    </div>
+    <!--<div class="shop_early">Shop early. <a href="index.html" class="shop_now" style="color: white;">Shop now &gt;</a></div>-->
+
+    <div class="emi">
+        <!--<p>Get up to 24 months No Cost EMI on all iPhone models from most leading banks.§ <a href="iphone.html" >Learn more&gt;</a></p>-->
+    </div>
+
+    <!--<div class="shop_early2">Get 6 months of Apple Music free with your AirPods.** <a href="pods.html" class="shop_now2">Shop now &gt;</a></div>-->
+
+
+    <h1 class="greetings">Welcome, <span id="user-email"></span>!</h1>
+    <script>
+        document.getElementById('user-email').textContent = localStorage.getItem('email') || 'Guest';
+    </script>
+
+    <div class="all">
+        <p><span>Perfection is not attainable,</span> But if we chase perfection we can catch excellence.</p>
+    </div>
+
+    <!--<div class="all_images">
+        <div class="box1">
+            <a href="mac.html"><img src="all1.png"></a>
+            <a href="mac.html" style="color: black;"><p>Mac</p></a>
+        </div>
+        <div class="box1">
+            <a href="iphone.html"><img src="all2.png"></a>
+            <a href="iphone.html" style="color: black;"><p>iPhone</p></a>
+        </div>
+        <div class="box1">
+            <a href="ipad.html"><img src="all3.png"></a>
+            <a href="ipad.html" style="color: black;"><p>iPad</p></a>
+        </div>
+        <div class="box1">
+            <a href="mac.html"><img src="all4.png"></a>
+            <a href="mac.html" style="color: black;"><p>Apple Watch</p></a>
+        </div>
+        <div class="box1">
+            <a href="pods.html"><img src="all5.png"></a>
+            <a href="pods.html"style="color: black;"><p>AirPods</p></a>
+        </div>
+        <div class="box1">
+            <a href="prateek.html"><img src="px.png" style="width: 80px; margin-left: 28px;"></a>
+            <a href="prateek.html"><p id="le" style="color: black;">Limited_Edition</p></a>
+        </div>
+        <div class="box1">
+            <a href="a.html"><img src="all6.png"></a>
+            <a href="a.html" style="color: black;"><p>Accessories</p></a>
+        </div>
+    </div>-->
+
+    
+    <p class="end">Copyright © 2024 Apple Inc &nbsp;|&nbsp; Prateek™. All rights reserved.</p>
+
+    <script src="home.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
