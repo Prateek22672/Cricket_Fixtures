@@ -136,8 +136,8 @@ body {
 .text {
     width: 100%;
     position: absolute;
-    top: 50%;
-    left: 65%;
+    top: 40%;
+    left: 61%;
     transform: translate(-50%, -50%);
 }
 
@@ -147,7 +147,7 @@ body {
     font-size: 40px;
     font-family: "Inter", sans-serif;
     font-weight: 450;
-    margin-top: 50px;
+    margin-top: 30px;
 }
 
 .p_span {
@@ -160,7 +160,7 @@ body {
     font-weight: 450;
     margin-top: 100px;
     text-align: center;
-    right: 15%;
+    right: 25%;
     text-decoration: none;
     transition: color 0.5s, text-decoration 0.5s ease;
 }
