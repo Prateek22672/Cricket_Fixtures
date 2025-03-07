@@ -160,7 +160,7 @@ body {
     font-weight: 450;
     margin-top: 100px;
     text-align: center;
-    right: 20%;
+    right: 18%;
     text-decoration: none;
     transition: color 0.5s, text-decoration 0.5s ease;
 }
@@ -396,13 +396,13 @@ span a:hover {
         width: 80%;
         position: absolute;
         top: 50%;
-        left: 45%;
+        left: 55%;
         transform: translate(-50%, -50%);
     }
 
     .p_span {
         top: 160%;
-        left: 5%;
+        left: 0%;
     }
     
     .text p {
