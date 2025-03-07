@@ -147,7 +147,7 @@ body {
     font-size: 40px;
     font-family: "Inter", sans-serif;
     font-weight: 450;
-    margin-top: 70px;
+    margin-top: 50px;
 }
 
 .p_span {
@@ -160,7 +160,7 @@ body {
     font-weight: 450;
     margin-top: 100px;
     text-align: center;
-    right: 5%;
+    right: 15%;
     text-decoration: none;
     transition: color 0.5s, text-decoration 0.5s ease;
 }
