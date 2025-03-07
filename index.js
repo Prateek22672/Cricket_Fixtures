@@ -13,7 +13,7 @@ function validateForm(event) {
         localStorage.setItem('name', name);
 
         // Redirect to store.html
-        window.location.href = 'store.html';
+        window.location.href = 'home.html';
     }
 }
  
