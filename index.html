@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Tournament - Fixture Generator</title>
+    <!-- Bootstrap CSS (Still useful for grid layout) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Link to YOUR custom CSS (Enhanced IPL Theme) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Optional: Font Awesome for Icons (Uncomment if you install/use it) -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
+    <style>
+        /* Minimal style for hidden class if not fully covered in external CSS */
+        .hidden { display: none; }
+         /* Style for the Top 4 selection area (ensure it's defined) */
+        #top4-selection {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        #top4-selection label { margin-bottom: 0.5rem; display: block; }
+        #top4-selection select { margin-bottom: 1rem; }
+        /* Stage Header for Fixtures */
+        .stage-header {
+            background-color: rgba(74, 20, 140, 0.3); color: #ffeb3b;
+            padding: 10px 15px; margin-top: 20px; margin-bottom: 0px;
+            border-radius: 8px 8px 0 0; font-weight: bold; text-transform: uppercase;
+        }
+        /* Ensure filter container looks okay even if fixtures aren't shown yet */
+         .filter-container {
+            margin-bottom: 1.5rem;
+            padding: 15px 20px;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .filter-container .form-label {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: var(--ipl-text-muted, #a0a0a0); /* Provide fallback color */
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+         .themed-select {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--ipl-text-light, #f0f0f0);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 30px;
+            padding: 8px 35px 8px 20px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            flex-grow: 1;
+            max-width: 350px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffd700' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 16px 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container wizard-container">
+        <h1 class="wizard-title">Tournament Setup Wizard</h1>
+
+        <!-- Progress Bar -->
+        <div class="progress-container mb-5">
+            <div class="progress-bar-custom" id="progressBar">
+                 <div class="progress-step active" data-step="1"><span>1</span><p>Basics</p></div>
+                 <div class="progress-step" data-step="2"><span>2</span><p>Participants</p></div>
+                 <div class="progress-step" data-step="3"><span>3</span><p>Schedule</p></div>
+                 <div class="progress-step" data-step="4" id="progressStep4"><span>4</span><p>Playoffs</p></div>
+             </div>
+        </div>
+
+         {# Display flashed messages (if Flask backend uses flash) #}
+         {% with messages = get_flashed_messages(with_categories=true) %}
+           {% if messages %}
+             {% for category, message in messages %}
+               <div class="alert alert-{{ category }} wizard-error alert-dismissible fade show" role="alert">
+                 {{ message }}
+                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+               </div>
+             {% endfor %}
+           {% endif %}
+         {% endwith %}
+
+        <!-- Form Wrapper -->
+        <form method="POST" action="/" id="wizardForm">
+            <!-- Step 1: Basics -->
+            <div class="wizard-step active" id="step1">
+                <div class="card wizard-card">
+                    <div class="card-header">Step 1: Tournament Basics</div>
+                    <div class="card-body">
+                         <div class="mb-4">
+                             <label for="tournament_name" class="form-label"><i class="fas fa-trophy me-2"></i>Tournament Name (Optional)</label>
+                             {# Use request.form to repopulate field on POST/error #}
+                             <input type="text" class="form-control" id="tournament_name" name="tournament_name" value="{{ request.form.tournament_name or '' }}" placeholder="E.g., Champions League 2024">
+                         </div>
+                         <div class="mb-4">
+                             <label for="tournament_type" class="form-label"><i class="fas fa-sitemap me-2"></i>Tournament Format</label>
+                             <select class="form-select" id="tournament_type" name="tournament_type" required>
+                                 <option value="round_robin" {% if request.form.tournament_type == 'round_robin' %}selected{% endif %}>Round Robin</option>
+                                 <option value="double_round_robin" {% if request.form.tournament_type == 'double_round_robin' %}selected{% endif %}>Double Round Robin</option>
+                                 <option value="single_elimination" {% if request.form.tournament_type == 'single_elimination' %}selected{% endif %}>Single Elimination</option>
+                                 <option value="double_elimination" {% if request.form.tournament_type == 'double_elimination' %}selected{% endif %}>Double Elimination</option>
+                                 <option value="group_knockout" {% if request.form.tournament_type == 'group_knockout' %}selected{% endif %}>Group Stage + Knockout</option>
+                             </select>
+                         </div>
+                         <div class="mb-3">
+                             <label for="include_playoffs" class="form-label"><i class="fas fa-flag-checkered me-2"></i>Include Top 4 Playoffs? (For RR/DRR)</label>
+                             <select class="form-select" id="include_playoffs" name="include_playoffs">
+                                 {# Check request.form first, then provide default #}
+                                 <option value="no" {% if request.form.include_playoffs == 'no' %}selected{% elif not request.form.include_playoffs %}selected{% endif %}>No</option>
+                                 <option value="yes" {% if request.form.include_playoffs == 'yes' %}selected{% endif %}>Yes (IPL Style)</option>
+                              </select>
+                              <small class="form-text text-muted-custom">Applies only if Format is Round Robin or Double RR.</small>
+                         </div>
+                     </div>
+                    <div class="wizard-footer">
+                         <span></span> {# Placeholder for alignment #}
+                         <button type="button" class="btn btn-wizard-next" onclick="nextStep(2)">Next <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Participants -->
+            <div class="wizard-step" id="step2">
+                <div class="card wizard-card">
+                    <div class="card-header">Step 2: Participants & Venues</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {# Updated input for Team/Venue pairs #}
+                            <label for="teams_venues" class="form-label"><i class="fas fa-users me-2"></i>Team & Home Venue Pairs (One per line)</label>
+                            <textarea class="form-control" id="teams_venues" name="teams_venues" rows="8" required placeholder="Team Alpha, Alpha Stadium
+Team Beta, Beta Arena
+Team Charlie, Charlie Field">{{ request.form.teams_venues or '' }}</textarea> {# Repopulate #}
+                            <small class="form-text text-muted-custom">Format: <strong>Team Name, Venue Name</strong>. Each team needs a primary venue. Unique venues will be used for scheduling.</small>
+                        </div>
+                    </div>
+                     <div class="wizard-footer">
+                        <button type="button" class="btn btn-wizard-prev" onclick="prevStep(1)"><i class="fas fa-arrow-left"></i> Previous</button>
+                        <button type="button" class="btn btn-wizard-next" onclick="nextStep(3)">Next <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Step 3: Schedule -->
+            <div class="wizard-step" id="step3">
+                 <div class="card wizard-card">
+                    <div class="card-header">Step 3: Scheduling Window</div>
+                    <div class="card-body">
+                        <p class="text-muted-custom mb-4">Select the overall start and end dates for the tournament.</p>
+                         <div class="row">
+                            <div class="col-md-6 mb-4 date-input-wrapper">
+                                <label for="start_date" class="form-label"><i class="fas fa-calendar-alt me-2"></i>Tournament Start Date</label>
+                                <input type="date" class="form-control date-input" id="start_date" name="start_date" value="{{ request.form.start_date or '' }}" required> {# Repopulate #}
+                            </div>
+                            <div class="col-md-6 mb-3 date-input-wrapper">
+                                <label for="end_date" class="form-label"><i class="fas fa-calendar-check me-2"></i>Tournament End Date</label>
+                                <input type="date" class="form-control date-input" id="end_date" name="end_date" value="{{ request.form.end_date or '' }}" required> {# Repopulate #}
+                            </div>
+                        </div>
+                    </div>
+                     <div class="wizard-footer">
+                        <button type="button" class="btn btn-wizard-prev" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Previous</button>
+                        {# This button now conditionally goes to step 4 or submits #}
+                        <button type="button" class="btn btn-wizard-next" onclick="goToNextAppropriateStep(4)">Next <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Step 4: Playoff Setup (Conditional for RR/DRR) -->
+            <div class="wizard-step" id="step4">
+                 <div class="card wizard-card">
+                     <div class="card-header">Step 4: Playoff Setup (Top 4 for RR/DRR)</div>
+                     <div class="card-body">
+                         <p class="text-muted-custom mb-4">Select the teams finishing in the Top 4 positions. Ensure selections are unique.</p>
+                          <div id="top4-selection"> {# This div wraps the inputs #}
+                             <div class="row">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <label for="top1_team" class="form-label">1st Place</label>
+                                    {# Add required attribute - browser validation + JS check #}
+                                    <select class="form-select" id="top1_team" name="top1_team" required>
+                                        <option value="" disabled {% if not request.form.top1_team %}selected{% endif %}>-- Select --</option>
+                                        {# Populated by Flask using teams_list passed to template #}
+                                        {% for team in teams_list or [] %}
+                                        <option value="{{ team }}" {% if request.form.top1_team == team %}selected{% endif %}>{{ team }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                 <div class="col-md-3 col-sm-6 mb-3">
+                                    <label for="top2_team" class="form-label">2nd Place</label>
+                                    <select class="form-select" id="top2_team" name="top2_team" required>
+                                       <option value="" disabled {% if not request.form.top2_team %}selected{% endif %}>-- Select --</option>
+                                         {% for team in teams_list or [] %}
+                                        <option value="{{ team }}" {% if request.form.top2_team == team %}selected{% endif %}>{{ team }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <label for="top3_team" class="form-label">3rd Place</label>
+                                    <select class="form-select" id="top3_team" name="top3_team" required>
+                                        <option value="" disabled {% if not request.form.top3_team %}selected{% endif %}>-- Select --</option>
+                                         {% for team in teams_list or [] %}
+                                        <option value="{{ team }}" {% if request.form.top3_team == team %}selected{% endif %}>{{ team }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <label for="top4_team" class="form-label">4th Place</label>
+                                    <select class="form-select" id="top4_team" name="top4_team" required>
+                                        <option value="" disabled {% if not request.form.top4_team %}selected{% endif %}>-- Select --</option>
+                                         {% for team in teams_list or [] %}
+                                        <option value="{{ team }}" {% if request.form.top4_team == team %}selected{% endif %}>{{ team }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                          </div> {# End top4-selection div #}
+                     </div>
+                      <div class="wizard-footer">
+                         <button type="button" class="btn btn-wizard-prev" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Previous</button>
+                         {# Final Submit Button #}
+                         <button type="submit" class="btn btn-wizard-generate"><i class="fas fa-cogs me-2"></i>Generate Fixtures</button>
+                     </div>
+                 </div>
+             </div>
+
+        </form> <!-- End Form Wrapper -->
+
+         {# --- FIXTURE DISPLAY AREA --- #}
+         {# This area shows results after form submission #}
+        <div id="fixtureResultsArea" class="mt-5">
+            {# Check if fixture data exists - passed from Flask #}
+            {% if fixtures_by_stage %}
+                 {# Loop through each stage (e.g., "League", "Group A", "Playoffs") sorted alphabetically #}
+                 {% for stage, stage_fixtures in fixtures_by_stage.items()|sort %}
+                 <div class="results-container card mb-4">
+                      <div class="card-header stage-header">{{ stage }} Fixtures</div>
+
+                      {# Display Filter only once, above the first stage's fixtures #}
+                      {% if loop.first %}
+                         <div class="filter-container card-body pb-0"> {# Reuse filter class for styling #}
+                             <label for="teamFilter" class="form-label">
+                                 <i class="fas fa-filter me-2"></i> Filter Matches:
+                             </label>
+                             <select id="teamFilter" class="form-select themed-select">
+                                 <option value="all" selected>Show All Teams</option>
+                                 {# Ensure teams_list is passed from Flask for dropdown population #}
+                                 {% for team in teams_list or [] %}
+                                 <option value="{{ team }}">{{ team }}</option>
+                                 {% endfor %}
+                             </select>
+                          </div>
+                      {% endif %}
+
+                      <div class="card-body pt-0"> {# Remove top padding as filter container has padding #}
+                          <div class="table-responsive">
+                              {# Generate unique table ID based on stage name for JS filter #}
+                              {# Use urlencode filter to handle special characters in stage names for IDs #}
+                              <table class="table table-striped table-hover fixture-table" id="fixtureTable_{{ stage|replace(' ','_')|replace('(','_')|replace(')','_')|urlencode }}">
+                                  <thead>
+                                      <tr>
+                                          <th>Match</th>
+                                          {# Conditionally show columns based on data in the first fixture of the stage #}
+                                          {% if stage_fixtures and stage_fixtures[0].round %}<th>Round</th>{% endif %}
+                                          {% if stage_fixtures and stage_fixtures[0].match_type %}<th>Type</th>{% endif %}
+                                          <th>Date</th>
+                                          <th>Day</th>
+                                          <th>Time Slot</th>
+                                          <th>Venue</th>
+                                          <th>Team 1</th>
+                                          <th>Team 2</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      {% for fixture in stage_fixtures %}
+                                      {# Add data attributes for filtering using actual team names #}
+                                      {# Ensure data attributes handle potentially tricky characters if team names have them #}
+                                      <tr class="fixture-row" data-team1="{{ fixture.team1 }}" data-team2="{{ fixture.team2 }}">
+                                          <td>{{ fixture.match_number }}</td>
+                                          {% if fixture.round %}<td>{{ fixture.round }}</td>{% endif %}
+                                          {% if fixture.match_type %}<td><b>{{ fixture.match_type }}</b></td>{% endif %} {# Make type bold #}
+                                          {# Ensure date object is formatted correctly, provide fallback #}
+                                          <td>{{ fixture.date.strftime('%Y-%m-%d') if fixture.date else 'N/A' }}</td>
+                                          <td>{{ fixture.date.strftime('%a') if fixture.date else 'N/A' }}</td>
+                                          <td>{{ fixture.time_slot or 'N/A' }}</td> {# Handle potential None timeslot #}
+                                          <td>{{ fixture.venue }}</td>
+                                          <td>{{ fixture.team1 }}</td>
+                                          <td>{{ fixture.team2 }}</td>
+                                      </tr>
+                                      {% endfor %}
+                                  </tbody>
+                              </table>
+                               {# Unique ID for no results message per table #}
+                               <p id="noResultsMessage_{{ stage|replace(' ','_')|replace('(','_')|replace(')','_')|urlencode }}" class="text-center text-muted-custom hidden mt-3">No matches found for the selected team in this stage.</p>
+                          </div>
+                      </div>
+                  </div>
+              {% endfor %} {# End loop through stages #}
+             {% elif request.method == 'POST' %} {# Show message only on POST if no fixtures generated and no flash errors are present #}
+                 {# Check if flash messages were displayed - requires passing them or checking existence #}
+                 {% if not get_flashed_messages() %}
+                     <div class="alert alert-info mt-5">No fixtures were generated. Please check your input and constraints.</div>
+                 {% endif %}
+             {% endif %} {# End if fixtures_by_stage #}
+        </div> {# End Fixture Results Area #}
+
+
+    </div> {# End Container #}
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Wizard JavaScript -->
+    <script src="{{ url_for('static', filename='wizard.js') }}"></script>
+    <!-- Fixture Filter JS (Use the modified version for multiple tables) -->
+     <script src="{{ url_for('static', filename='filter_view.js') }}"></script>
+</body>
+</html>
